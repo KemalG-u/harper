@@ -122,6 +122,8 @@ fn hash_prefixed_descriptions_are_not_treated_as_comments() {
     for source in [
         "feat(harper): #123 add mising files\n",
         "# ignored comment\nfeat(harper): #123 add mising files\n",
+        "feat(caf\u{e9}): #123 add mising files\n",
+        "feat(harper): #123 add files\n\nmising files\n",
     ] {
         let document = Document::new(source, &GitCommitParser::default(), &dict);
         let misspellings: Vec<_> = linter
