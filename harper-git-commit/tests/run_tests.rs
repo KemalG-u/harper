@@ -60,9 +60,11 @@ fn conventional_commit_prefixes_are_not_parsed() {
                 .all(|token| token.span.start >= description_start),
             "conventional commit prefix was parsed: {prefix:?}"
         );
-        assert!(document.tokens().any(|token| {
-            token.span.get_content_string(document.get_source()) == "missing"
-        }));
+        assert!(
+            document
+                .tokens()
+                .any(|token| token.span.get_content_string(document.get_source()) == "missing")
+        );
     }
 }
 
@@ -77,6 +79,27 @@ fn conventional_commit_descriptions_are_still_spellchecked() {
         "feat(nvf)!: add mising files\n",
         "chore: add mising files\n",
         "feat(caf\u{e9}): add mising files\n",
+    ] {
+        let document = Document::new(source, &GitCommitParser::default(), &dict);
+        let misspellings: Vec<_> = linter
+            .lint(&document)
+            .into_iter()
+            .filter(|lint| lint.lint_kind == LintKind::Spelling)
+            .map(|lint| lint.span.get_content_string(document.get_source()))
+            .collect();
+
+        assert_eq!(misspellings, ["mising"], "source: {source:?}");
+    }
+}
+
+#[test]
+fn ordinary_subjects_and_commit_bodies_are_still_spellchecked() {
+    let dict = FstDictionary::curated();
+    let mut linter = LintGroup::new_curated(dict.clone(), Dialect::American);
+
+    for source in [
+        "add mising files\n",
+        "feat(harper): add files\n\nmising files\n",
     ] {
         let document = Document::new(source, &GitCommitParser::default(), &dict);
         let misspellings: Vec<_> = linter

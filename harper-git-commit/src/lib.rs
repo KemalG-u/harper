@@ -9,7 +9,9 @@ pub struct GitCommitParser {
 
 impl GitCommitParser {
     fn node_condition(n: &Node) -> bool {
-        matches!(n.kind(), "subject" | "message_line" | "breaking_change")
+        matches!(n.kind(), "message_line" | "breaking_change")
+            || (n.parent().is_some_and(|parent| parent.kind() == "subject")
+                && n.kind() != "prefix")
     }
 
     pub fn new(markdown_options: MarkdownOptions) -> Self {
