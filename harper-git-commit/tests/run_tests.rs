@@ -57,11 +57,10 @@ fn conventional_commit_prefixes_are_not_parsed() {
         assert!(
             document
                 .tokens()
-                .iter()
                 .all(|token| token.span.start >= description_start),
             "conventional commit prefix was parsed: {prefix:?}"
         );
-        assert!(document.tokens().iter().any(|token| {
+        assert!(document.tokens().any(|token| {
             token.span.get_content_string(document.get_source()) == "missing"
         }));
     }
