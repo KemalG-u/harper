@@ -113,3 +113,24 @@ fn ordinary_subjects_and_commit_bodies_are_still_spellchecked() {
         assert_eq!(misspellings, ["mising"], "source: {source:?}");
     }
 }
+
+#[test]
+fn hash_prefixed_descriptions_are_not_treated_as_comments() {
+    let dict = FstDictionary::curated();
+    let mut linter = LintGroup::new_curated(dict.clone(), Dialect::American);
+
+    for source in [
+        "feat(harper): #123 add mising files\n",
+        "# ignored comment\nfeat(harper): #123 add mising files\n",
+    ] {
+        let document = Document::new(source, &GitCommitParser::default(), &dict);
+        let misspellings: Vec<_> = linter
+            .lint(&document)
+            .into_iter()
+            .filter(|lint| lint.lint_kind == LintKind::Spelling)
+            .map(|lint| lint.span.get_content_string(document.get_source()))
+            .collect();
+
+        assert_eq!(misspellings, ["mising"], "source: {source:?}");
+    }
+}
