@@ -24,10 +24,16 @@ jobs:
           clean: false
 
       - name: Use the repository stable Rust toolchain
-        run: rustup toolchain install stable --profile minimal --component rustfmt
+        run: rustup toolchain install stable --profile minimal --component rustfmt --component clippy
 
       - name: Report Rust compiler version
         run: rustc +stable --version
 
       - name: Test the git commit parser with locked dependencies
         run: cargo +stable test --locked -p harper-git-commit
+
+      - name: Check formatting of the changed crate
+        run: cargo +stable fmt --package harper-git-commit -- --check
+
+      - name: Check the changed crate and tests with Clippy
+        run: cargo +stable clippy --locked -p harper-git-commit --tests -- -D warnings
