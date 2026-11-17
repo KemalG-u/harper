@@ -100,6 +100,7 @@ fn ordinary_subjects_and_commit_bodies_are_still_spellchecked() {
     for source in [
         "add mising files\n",
         "feat(harper): add files\n\nmising files\n",
+        "# ignored comment\nfeat(harper): add mising files\n",
     ] {
         let document = Document::new(source, &GitCommitParser::default(), &dict);
         let misspellings: Vec<_> = linter
