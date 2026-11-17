@@ -1,0 +1,33 @@
+name: Harper 4962 conventional commit regression
+
+on:
+  push:
+    branches:
+      - 'ci/harper-4962-*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    if: github.repository_owner == 'KemalG-u'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - name: Checkout test source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+          clean: false
+
+      - name: Use the repository stable Rust toolchain
+        run: rustup toolchain install stable --profile minimal --component rustfmt
+
+      - name: Report Rust compiler version
+        run: rustc +stable --version
+
+      - name: Test the git commit parser with locked dependencies
+        run: cargo +stable test --locked -p harper-git-commit
