@@ -21,7 +21,9 @@ impl GitCommitParser {
             ),
             prefixes: TreeSitterMasker::new(tree_sitter_gitcommit::LANGUAGE.into(), |node| {
                 node.kind() == "prefix"
-                    && node.parent().is_some_and(|parent| parent.kind() == "subject")
+                    && node
+                        .parent()
+                        .is_some_and(|parent| parent.kind() == "subject")
             }),
         }
     }
